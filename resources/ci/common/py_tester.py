@@ -102,10 +102,10 @@ for APP in ["entrando","spritesomething"]:
                     satisfied[0],
                     sver
                   )
-                ).encode("utf-16")
+                ).decode("utf-8")
               )
             elif "status 'error'" in line.strip():
-              print(("🟥" + line.strip()).encode("utf-16"))
+              print(("🟥" + line.strip()).decode("utf-8"))
               exit(1)
             else:
               print(line.strip())
