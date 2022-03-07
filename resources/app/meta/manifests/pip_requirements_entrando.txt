@@ -1,0 +1,8 @@
+wheel
+aioconsole
+aenum
+colorama
+fast-enum
+python-bps-continued
+pyyaml
+websockets
