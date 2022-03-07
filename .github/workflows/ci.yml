@@ -29,6 +29,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install Wheel
+        run: |
+          python -m pip install wheel
       - name: Run Tester
         run: |
           python ./resources/ci/common/py_tester.py

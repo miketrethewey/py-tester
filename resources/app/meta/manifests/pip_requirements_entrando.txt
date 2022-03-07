@@ -1,4 +1,3 @@
-wheel
 aioconsole
 aenum
 colorama
