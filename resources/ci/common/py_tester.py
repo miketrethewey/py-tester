@@ -96,16 +96,16 @@ for APP in ["entrando","spritesomething"]:
               sver = satisfied[1].split("(").pop().replace(")","")
               print(
                 (
-                  "🟩%s\t%s"
+                  ":green_square:%s\t%s"
                   %
                   (
                     satisfied[0],
                     sver
                   )
-                ).decode("utf-8")
+                )
               )
             elif "status 'error'" in line.strip():
-              print(("🟥" + line.strip()).decode("utf-8"))
+              print((":req_square:" + line.strip()))
               exit(1)
             else:
               print(line.strip())
