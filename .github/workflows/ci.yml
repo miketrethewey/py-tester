@@ -22,6 +22,9 @@ jobs:
           3.9,
           "3.10"
         ]
+        exclude:
+          - os-name: macos-latest
+            python-version: 3.9
     steps:
       - name: Checkout commit
         uses: actions/checkout@v2

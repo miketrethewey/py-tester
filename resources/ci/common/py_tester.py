@@ -96,7 +96,7 @@ for APP in ["entrando","spritesomething"]:
               sver = satisfied[1].split("(").pop().replace(")","")
               print(
                 (
-                  ":green_square:%s\t%s"
+                  "[ ]%s\t%s"
                   %
                   (
                     satisfied[0],
@@ -105,7 +105,7 @@ for APP in ["entrando","spritesomething"]:
                 )
               )
             elif "status 'error'" in line.strip():
-              print((":req_square:" + line.strip()))
+              print(("[X]" + line.strip()))
               exit(1)
             else:
               print(line.strip())
