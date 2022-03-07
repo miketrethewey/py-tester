@@ -72,7 +72,10 @@ for APP in ["entrando","spritesomething"]:
       args = [ *PYEXE ]
     else:
       args = [ PYEXE ]
-    do_python(args)
+    try:
+      do_python(args)
+    except Exception as e:
+      print(e)
 
     for PIPEXE in ["pip","pip3"]:
       do_pip(args, PIPEXE)
