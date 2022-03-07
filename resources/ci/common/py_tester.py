@@ -95,11 +95,13 @@ for APP in ["entrando","spritesomething"]:
               satisfied = line.strip().split(" in ")
               sver = satisfied[1].split("(").pop().replace(")","")
               print(
-                "🟩%s\t%s"
-                %
                 (
-                  satisfied[0],
-                  sver
+                  "🟩%s\t%s"
+                  %
+                  (
+                    satisfied[0],
+                    sver
+                  )
                 ).encode("utf-8")
               )
             elif "status 'error'" in line.strip():
