@@ -74,39 +74,38 @@ for APP in ["entrando","spritesomething"]:
       args = [ PYEXE ]
     try:
       do_python(args)
+      for PIPEXE in ["pip","pip3"]:
+        do_pip(args, PIPEXE)
+        ret = subprocess.run([ *args, "-m", PIPEXE, "install", "--upgrade", "pip" ], capture_output=True, text=True)
+        if ret.stdout.strip():
+          if "already satisfied" not in ret.stdout.strip():
+            print(ret.stdout.strip())
+            do_pip(args, PIPEXE)
+        ret = subprocess.run([ *args, "-m", PIPEXE, "install", "-r", os.path.join(
+          ".",
+          "resources",
+          "app",
+          "meta",
+          "manifests",
+          "pip_requirements_" + APP + ".txt"
+        )], capture_output=True, text=True)
+        if ret.stdout.strip():
+          for line in ret.stdout.strip().split("\n"):
+            if "already satisfied" in line.strip():
+              satisfied = line.strip().split(" in ")
+              sver = satisfied[1].split("(").pop().replace(")","")
+              print(
+                "🟩%s\t%s"
+                %
+                (
+                  satisfied[0],
+                  sver
+                )
+              )
+            elif "status 'error'" in line.strip():
+              print("🟥" + line.strip())
+            else:
+              print(line.strip())
+          print("")
     except Exception as e:
       print(e)
-
-    for PIPEXE in ["pip","pip3"]:
-      do_pip(args, PIPEXE)
-      ret = subprocess.run([ *args, "-m", PIPEXE, "install", "--upgrade", "pip" ], capture_output=True, text=True)
-      if ret.stdout.strip():
-        if "already satisfied" not in ret.stdout.strip():
-          print(ret.stdout.strip())
-          do_pip(args, PIPEXE)
-      ret = subprocess.run([ *args, "-m", PIPEXE, "install", "-r", os.path.join(
-        ".",
-        "resources",
-        "app",
-        "meta",
-        "manifests",
-        "pip_requirements_" + APP + ".txt"
-      )], capture_output=True, text=True)
-      if ret.stdout.strip():
-        for line in ret.stdout.strip().split("\n"):
-          if "already satisfied" in line.strip():
-            satisfied = line.strip().split(" in ")
-            sver = satisfied[1].split("(").pop().replace(")","")
-            print(
-              "🟩%s\t%s"
-              %
-              (
-                satisfied[0],
-                sver
-              )
-            )
-          elif "status 'error'" in line.strip():
-            print("🟥" + line.strip())
-          else:
-            print(line.strip())
-        print("")
