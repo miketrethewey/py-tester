@@ -4,9 +4,12 @@ import os
 import platform
 import subprocess
 import sys
+import traceback
 from my_path import get_py_path
 
 env = common.prepare_env()
+
+WIDTH = 60
 
 PYTHON_EXECUTABLE = os.path.splitext(sys.executable.split(os.path.sep).pop())[0]
 PYTHON_VERSION = sys.version.split(" ")[0]
@@ -16,7 +19,7 @@ def do_python(args):
   ret = subprocess.run([ *args, "--version" ], capture_output=True, text=True)
   if ret.stdout.strip():
     PYTHON_VERSION = ret.stdout.strip().split(" ")[1]
-    print(
+    PY_STRING = (
       "%s\t%s\t%s"
       %
       (
@@ -25,6 +28,8 @@ def do_python(args):
         sys.platform
       )
     )
+    print(PY_STRING)
+    print('.' * WIDTH)
 
 def do_pip(args, PIPEXE):
   ret = subprocess.run([ *args, "-m", PIPEXE, "--version" ], capture_output=True, text=True)
@@ -32,7 +37,7 @@ def do_pip(args, PIPEXE):
     if " from " in ret.stdout.strip():
       PIP_VERSION = ret.stdout.strip().split(" from ")[0].split(" ")[1]
       if PIP_VERSION:
-        print(
+        PIP_STRING = (
           "%s\t%s\t%s\t%s\t%s"
           %
           (
@@ -43,6 +48,8 @@ def do_pip(args, PIPEXE):
             PIP_VERSION
           )
         )
+        print(PIP_STRING)
+        print('.' * WIDTH)
 
 heading = (
   "%s-%s-%s"
@@ -54,7 +61,7 @@ heading = (
   )
 )
 print(heading)
-print('=' * len(heading))
+print('=' * WIDTH)
 
 PYTHON_PATH = env["PYTHON_EXE_PATH"]
 PIP_PATH = env["PIP_EXE_PATH"]
@@ -62,12 +69,19 @@ PIP_EXECUTABLE = "pip" if "windows" in env["OS_NAME"] else "pip3"
 PIP_EXECUTABLE = "pip" if "osx" in env["OS_NAME"] and "actions" in env["CI_SYSTEM"] else PIP_EXECUTABLE
 PIP_VERSION = ""
 
-for APP in [((len(sys.argv) > 1) and sys.argv[1]) or ["entrando","spritesomething"]]:
+APPS = ["entrando","spritesomething"]
+if len(sys.argv) > 1:
+  APPS = [ sys.argv ]
+
+for APP in APPS:
   print(APP)
+  print('-' * WIDTH)
   for PYEXE in ["py","python","python3"]:
     args = []
     if PYEXE == "py":
       PYEXE = [ PYEXE, "-" + PYTHON_MINOR_VERSION]
+      if "windows" not in env["OS_NAME"]:
+        continue
     if isinstance(PYEXE, list):
       args = [ *PYEXE ]
     else:
@@ -91,24 +105,32 @@ for APP in [((len(sys.argv) > 1) and sys.argv[1]) or ["entrando","spritesomethin
         )], capture_output=True, text=True)
         if ret.stdout.strip():
           for line in ret.stdout.strip().split("\n"):
-            if "already satisfied" in line.strip():
+            if "status 'error'" in line.strip():
+              print(
+                "[%s] %s"
+                %
+                (
+                  "X",
+                  line.strip()
+                )
+              )
+              exit(1)
+            elif "already satisfied" in line.strip() or "Building wheel" in line.strip():
               satisfied = line.strip().split(" in ")
-              sver = satisfied[1].split("(").pop().replace(")","")
+              sver = ((len(satisfied) > 1) and satisfied[1].split("(").pop().replace(")","")) or ""
               print(
                 (
-                  "[ ]%s\t%s"
+                  "[%s] %s\t%s"
                   %
                   (
+                    "✓",
                     satisfied[0],
                     sver
                   )
                 )
               )
-            elif "status 'error'" in line.strip():
-              print(("[X]" + line.strip()))
-              exit(1)
             else:
               print(line.strip())
           print("")
     except Exception as e:
-      print(e)
+      traceback.print_exc()
