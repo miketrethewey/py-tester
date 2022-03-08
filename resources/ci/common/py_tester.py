@@ -110,7 +110,7 @@ for APP in APPS:
                 "[%s] %s"
                 %
                 (
-                  "X",
+                  "_",
                   line.strip()
                 )
               )
@@ -123,7 +123,7 @@ for APP in APPS:
                   "[%s] %s\t%s"
                   %
                   (
-                    "✓",
+                    "X",
                     satisfied[0],
                     sver
                   )
