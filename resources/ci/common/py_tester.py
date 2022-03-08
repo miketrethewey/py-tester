@@ -129,6 +129,8 @@ for APP in APPS:
                   )
                 )
               )
+            elif "Collecting" in line.strip() or "eta 0:00:00" in line.strip():
+              pass
             else:
               print(line.strip())
           print("")
