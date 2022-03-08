@@ -62,7 +62,7 @@ PIP_EXECUTABLE = "pip" if "windows" in env["OS_NAME"] else "pip3"
 PIP_EXECUTABLE = "pip" if "osx" in env["OS_NAME"] and "actions" in env["CI_SYSTEM"] else PIP_EXECUTABLE
 PIP_VERSION = ""
 
-for APP in ["entrando","spritesomething"]:
+for APP in [((len(sys.argv) > 1) and sys.argv[1]) or ["entrando","spritesomething"]]:
   print(APP)
   for PYEXE in ["py","python","python3"]:
     args = []
