@@ -71,7 +71,7 @@ PIP_VERSION = ""
 
 APPS = ["entrando","spritesomething"]
 if len(sys.argv) > 1:
-  APPS = [ sys.argv ]
+  APPS = [ sys.argv[1] ]
 
 for APP in APPS:
   print(APP)
