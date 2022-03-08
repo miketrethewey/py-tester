@@ -10,6 +10,11 @@ jobs:
     runs-on: ${{ matrix.os-name }}
     strategy:
       matrix:
+        app: [
+          "entrando",
+          "spritesomething"
+        ]
+
         # https://github.com/actions/virtual-environments
         os-name: [
           ubuntu-latest,
@@ -22,24 +27,10 @@ jobs:
           3.9,
           "3.10"
         ]
-        app: [
-          "entrando",
-          "spritesomething"
-        ]
         exclude:
           - app: spritesomething
-            os-name: macos-latest
-            python-version: 3.9
-          - app: spritesomething
-            os-name: macos-latest
-            python-version: "3.10"
-
-          - app: spritesomething
-            os-name: windows-latest
-            python-version: 3.9
-          - app: spritesomething
-            os-name: windows-latest
-            python-version: "3.10"
+            os-name: [ macos-latest, windows-latest ]
+            python-version: [ 3.9, "3.10" ]
 
     steps:
       - name: Checkout commit
