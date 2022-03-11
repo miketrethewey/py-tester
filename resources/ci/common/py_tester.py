@@ -53,7 +53,7 @@ def do_python(args):
       "%s\t%s\t%s"
       %
       (
-        isinstance(args[0], list) and " ".join(args[0]) or args[0],
+        ((isinstance(args[0], list) and " ".join(args[0])) or args[0]).strip(),
         PYTHON_VERSION,
         sys.platform
       )
@@ -77,7 +77,7 @@ def do_pip(args, PIPEXE):
           "%s\t%s\t%s\t%s\t%s\t%s"
           %
           (
-            isinstance(args[0], list) and " ".join(args[0]) or args[0],
+            ((isinstance(args[0], list) and " ".join(args[0])) or args[0]).strip(),
             PYTHON_VERSION,
             sys.platform,
             PIP_EXECUTABLE,
@@ -176,34 +176,34 @@ for APP in APPS:
               )
               exit(1)
             # if it's already satisfied or building a wheel, print version data
-            elif "already satisfied" in line.strip() or \
-              "Building wheel" in line.strip() or \
-              "Created wheel" in line.strip():
+            elif "already satisfied" in line or \
+              "Building wheel" in line or \
+              "Created wheel" in line:
               satisfied = line.strip().split(" in ")
               sver = ((len(satisfied) > 1) and satisfied[1].split("(").pop().replace(")","")) or ""
 
-              if "Created wheel" in line.strip():
-                satisfied = [ line.split(':')[0] ]
-                sver = line.split('-')[1]
+              if "Created wheel" in line:
+                satisfied = [ line.strip().split(':')[0] ]
+                sver = line.strip().split('-')[1]
 
               print(
                 (
                   "[%s] %s\t%s\t%s"
                   %
                   (
-                    "Building wheel" in line.strip() and '.' or "X",
+                    "Building wheel" in line and '.' or "X",
                     satisfied[0],
                     sver,
-                    sver and get_module_version(satisfied[0].split(" ")[-1]) or ""
+                    (sver and get_module_version(satisfied[0].split(" ")[-1])).strip() or ""
                   )
                 )
               )
             # ignore lines about certain things
-            elif "Collecting" in line.strip() or \
-              "Downloading" in line.strip() or \
-              "eta 0:00:00" in line.strip() or \
-              "Preparing metadata" in line.strip() or \
-              "Stored in" in line.strip():
+            elif "Collecting" in line or \
+              "Downloading" in line or \
+              "eta 0:00:00" in line or \
+              "Preparing metadata" in line or \
+              "Stored in" in line:
               pass
             # else, I don't know what it is, print it
             else:
