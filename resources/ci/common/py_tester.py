@@ -14,6 +14,35 @@ WIDTH = 60 # width for labels
 PYTHON_EXECUTABLE = os.path.splitext(sys.executable.split(os.path.sep).pop())[0]  # get command to run python
 PYTHON_VERSION = sys.version.split(" ")[0]                                        # get python version
 PYTHON_MINOR_VERSION = '.'.join(PYTHON_VERSION.split(".")[:2])                    # get python major.minor version
+PIP_VERSION = ""
+PIP_FLOAT_VERSION = 0
+
+def get_module_version(module):
+  # pip index versions [module]                             // >= 21.2
+  # pip install [module]==                                  // >= 21.1
+  # pip install --use-deprecated=legacy-resolver [module]== // >= 20.3
+  # pip install [module]==                                  // >=  9.0
+  # pip install [module]==blork                             // <   9.0
+  global PIP_FLOAT_VERSION
+  ret = ""
+  ver = ""
+
+  if float(PIP_FLOAT_VERSION) >= 21.2:
+    ret = subprocess.run([ *args, "-m", PIPEXE, "index", "versions", module ], capture_output=True, text=True)
+    ver = (list(map(lambda x: x.split(' ')[-1], ret.stdout.strip().split("\n")[2::])))[1]
+  elif float(PIP_FLOAT_VERSION) >= 21.1:
+    ret = subprocess.run([ *args, "-m", PIPEXE, "install", f"{module}==" ], capture_output=True, text=True)
+  elif float(PIP_FLOAT_VERSION) >= 20.3:
+    ret = subprocess.run([ *args, "-m", PIPEXE, "install", "--use-deprecated=legacy-resolver", f"{module}==" ], capture_output=True, text=True)
+  elif float(PIP_FLOAT_VERSION) >= 9.0:
+    ret = subprocess.run([ *args, "-m", PIPEXE, "install", f"{module}==" ], capture_output=True, text=True)
+  elif float(PIP_FLOAT_VERSION) < 9.0:
+    ret = subprocess.run([ *args, "-m", PIPEXE, "install", f"{module}==blork" ], capture_output=True, text=True)
+
+  if ver == "" and ret.stderr.strip():
+    ver = (ret.stderr.strip().split("\n")[0].split(",")[-1].replace(')','')).strip()
+
+  return ver
 
 # get python debug info
 def do_python(args):
@@ -39,7 +68,11 @@ def do_pip(args, PIPEXE):
     if " from " in ret.stdout.strip():
       PIP_VERSION = ret.stdout.strip().split(" from ")[0].split(" ")[1]
       if PIP_VERSION:
-        PIP_LATEST = "???" # remember to do something with this...
+        b,f,a = PIP_VERSION.partition('.')
+        global PIP_FLOAT_VERSION
+        PIP_FLOAT_VERSION = b+f+a.replace('.','')
+        PIP_LATEST = get_module_version("pip")
+
         PIP_STRING = (
           "%s\t%s\t%s\t%s\t%s\t%s"
           %
@@ -148,14 +181,20 @@ for APP in APPS:
               "Created wheel" in line.strip():
               satisfied = line.strip().split(" in ")
               sver = ((len(satisfied) > 1) and satisfied[1].split("(").pop().replace(")","")) or ""
+
+              if "Created wheel" in line.strip():
+                satisfied = [ line.split(':')[0] ]
+                sver = line.split('-')[1]
+
               print(
                 (
                   "[%s] %s\t%s"
                   %
                   (
-                    "X",
+                    "Building wheel" in line.strip() and '.' or "X",
                     satisfied[0],
-                    sver
+                    sver,
+                    sver and get_module_version(satisfied[0].split(" ")[-1]) or ""
                   )
                 )
               )
