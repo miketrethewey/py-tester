@@ -39,7 +39,7 @@ def do_pip(args, PIPEXE):
     if " from " in ret.stdout.strip():
       PIP_VERSION = ret.stdout.strip().split(" from ")[0].split(" ")[1]
       if PIP_VERSION:
-        PIP_LATEST =
+        PIP_LATEST = "???" # remember to do something with this...
         PIP_STRING = (
           "%s\t%s\t%s\t%s\t%s"
           %
