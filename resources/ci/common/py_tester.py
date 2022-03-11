@@ -188,7 +188,7 @@ for APP in APPS:
 
               print(
                 (
-                  "[%s] %s\t%s"
+                  "[%s] %s\t%s\t%s"
                   %
                   (
                     "Building wheel" in line.strip() and '.' or "X",
