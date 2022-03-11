@@ -185,7 +185,7 @@ for APP in APPS:
               if "Created wheel" in line:
                 line = line.strip().split(':')
                 satisfied = [ line[0] ]
-                sver = line.split('-')[1]
+                sver = line[1].split('-')[1]
 
               print(
                 (
