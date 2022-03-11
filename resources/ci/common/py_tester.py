@@ -183,8 +183,9 @@ for APP in APPS:
               sver = ((len(satisfied) > 1) and satisfied[1].split("(").pop().replace(")","")) or ""
 
               if "Created wheel" in line:
-                satisfied = [ line.strip().split(':')[0] ]
-                sver = line.strip().split('-')[1]
+                line = line.strip().split(':')
+                satisfied = [ line[0] ]
+                sver = line.split('-')[1]
 
               print(
                 (
