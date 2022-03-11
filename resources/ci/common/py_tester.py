@@ -144,7 +144,7 @@ for APP in APPS:
       do_python(args) # print python debug data
 
       # foreach py executable
-      for PIPEXE in ["pip","pip3"]:
+      for PIPEXE in ["pip3","pip"]:
         do_pip(args, PIPEXE)        # print pip debug data
         # upgrade pip
         ret = subprocess.run([ *args, "-m", PIPEXE, "install", "--upgrade", "pip" ], capture_output=True, text=True)
