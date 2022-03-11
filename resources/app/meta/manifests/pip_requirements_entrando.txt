@@ -1,5 +1,5 @@
-aioconsole
 aenum
+aioconsole
 colorama
 fast-enum
 python-bps-continued

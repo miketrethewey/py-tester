@@ -120,8 +120,12 @@ for APP in APPS:
   # print app name
   print(APP)
   print('-' * WIDTH)
+  success = False
   # foreach py executable
   for PYEXE in ["py","python3","python"]:
+    if success:
+      continue
+
     args = []
     # if it's the py launcher, specify the version
     if PYEXE == "py":
@@ -204,12 +208,14 @@ for APP in APPS:
               "Downloading" in line or \
               "eta 0:00:00" in line or \
               "Preparing metadata" in line or \
+              "Successfully built" in line or \
               "Stored in" in line:
               pass
             # else, I don't know what it is, print it
             else:
               print(line.strip())
           print("")
+          success = True
     # if something else went fucky, print it
     except Exception as e:
       traceback.print_exc()
