@@ -41,7 +41,7 @@ def do_pip(args, PIPEXE):
       if PIP_VERSION:
         PIP_LATEST = "???" # remember to do something with this...
         PIP_STRING = (
-          "%s\t%s\t%s\t%s\t%s"
+          "%s\t%s\t%s\t%s\t%s\t%s"
           %
           (
             isinstance(args[0], list) and " ".join(args[0]) or args[0],
