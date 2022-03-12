@@ -43,6 +43,43 @@ jobs:
       - name: Run Tester
         run: |
           python ./resources/ci/common/py_tester.py ${{ matrix.app }}
+      - name: Upload documents
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.app }}-${{ matrix.os-name }}-${{ matrix.python-version }}-manifests
+          path: ./resources/user/manifests/*
+
+  cleanup:
+    needs: test
+    runs-on: ${{ matrix.os-name }}
+    strategy:
+      matrix:
+        app: ["entrando", "spritesomething"]
+
+        # https://github.com/actions/virtual-environments
+        os-name: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.7, 3.8, 3.9, "3.10"]
+        # exclude:
+        #   - app: spritesomething
+        #     os-name: macos-latest
+        #     python-version: 3.9
+        #   - app: spritesomething
+        #     os-name: macos-latest
+        #     python-version: "3.10"
+
+        #   - app: spritesomething
+        #     os-name: windows-latest
+        #     python-version: 3.9
+        #   - app: spritesomething
+        #     os-name: windows-latest
+        #     python-version: "3.10"
+
+    steps:
+      - name: Download documents
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.app }}-${{ matrix.os-name }}-${{ matrix.python-version }}-manifests
+          path: ./resources/user/manifests/*
       - name: Debug Info
         run: |
           cat ./resources/user/manifests/pipline.txt
