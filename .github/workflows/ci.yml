@@ -81,7 +81,9 @@ jobs:
         with:
           name: ${{ matrix.app }}-${{ matrix.os-name }}-${{ matrix.python-version }}-manifests
           path: ./resources/user/manifests
-      - name: Debug Info
+      - name: Download listing
         run: |
           ls ./resources/user/manifests
+      - name: Debug info
+        run: |
           cat ./resources/user/manifests/pipline.txt
