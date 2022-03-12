@@ -12,6 +12,8 @@ env = common.prepare_env()  # get environment variables
 
 WIDTH = 70  # width for labels
 
+args = []
+PIPEXE = ""
 PYTHON_EXECUTABLE = os.path.splitext(sys.executable.split(os.path.sep).pop())[
     0]  # get command to run python
 # get python version
@@ -29,6 +31,8 @@ def get_module_version(module):
     # pip install --use-deprecated=legacy-resolver [module]== // >= 20.3
     # pip install [module]==                                  // >=  9.0
     # pip install [module]==blork                             // <   9.0
+    global args
+    global PIPEXE
     global PIP_FLOAT_VERSION
     ret = ""
     ver = ""
@@ -60,7 +64,7 @@ def get_module_version(module):
     return ver
 
 
-def do_python(args):
+def do_python():
     # get python debug info
     ret = subprocess.run([*args, "--version"], capture_output=True, text=True)
     if ret.stdout.strip():
@@ -79,7 +83,7 @@ def do_python(args):
         print('.' * WIDTH)
 
 
-def do_pip(args, PIPEXE):
+def do_pip():
     global VERSIONS
     # get pip debug info
     ret = subprocess.run([*args, "-m", PIPEXE, "--version"],
@@ -122,6 +126,7 @@ def do_pip(args, PIPEXE):
 
 
 def main():
+    global args
     # print python debug info
     heading = (
         "%s-%s-%s"
@@ -176,11 +181,11 @@ def main():
                 args = [PYEXE]
 
             try:
-                do_python(args)  # print python debug data
+                do_python()  # print python debug data
 
                 # foreach py executable
                 for PIPEXE in ["pip3", "pip"]:
-                    do_pip(args, PIPEXE)        # print pip debug data
+                    do_pip()        # print pip debug data
                     # upgrade pip
                     ret = subprocess.run(
                         [*args, "-m", PIPEXE, "install", "--upgrade", "pip"], capture_output=True, text=True)
@@ -189,7 +194,7 @@ def main():
                         # if it's not already satisfied, update it
                         if "already satisfied" not in ret.stdout.strip():
                             print(ret.stdout.strip())
-                            do_pip(args, PIPEXE)
+                            do_pip()
 
                     # install modules from list
                     ret = subprocess.run([*args, "-m", PIPEXE, "install", "-r", os.path.join(
@@ -270,5 +275,5 @@ def main():
             except Exception as e:
                 traceback.print_exc()
 
-if __name__ == "main":
+if __name__ == "__main__":
     main()
