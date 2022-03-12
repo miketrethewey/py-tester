@@ -82,9 +82,8 @@ jobs:
         with:
           name: ${{ matrix.app }}-${{ matrix.os-name }}-${{ matrix.python-version }}-manifests
           path: ./resources/user/manifests
-      - name: Echo download path
-        run: echo ${{ steps.download.outputs.download-path }}
-      - name: List downloaded files
-        run: ls ${{ steps.download.outputs.download-path }}
       - name: Debug info
-        run: cat ${{ steps.download.outputs.download-path }}/pipline.txt
+        run: |
+          if [ -f "${{ steps.download.outputs.download-path }}/pipline.txt" ]; then
+            cat ${{ steps.download.outputs.download-path }}/pipline.txt
+          fi
