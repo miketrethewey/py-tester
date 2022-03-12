@@ -43,6 +43,9 @@ jobs:
       - name: Run Tester
         run: |
           python ./resources/ci/common/py_tester.py ${{ matrix.app }}
+      - name: Debug Info
+        run: |
+          cat ./resources/user/manifests/pipline.txt
       - name: Upload documents
         uses: actions/upload-artifact@v3
         with:
