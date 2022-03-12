@@ -46,5 +46,5 @@ jobs:
       - name: Upload documents
         uses: actions/upload-artifact@v3
         with:
-          name: manifests
+          name: ${{ matrix.app }}-${{ matrix.os-name }}-${{ matrix.python-version }}-manifests
           path: ./resources/user/manifests/*
