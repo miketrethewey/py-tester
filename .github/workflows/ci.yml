@@ -49,7 +49,8 @@ jobs:
           name: ${{ matrix.app }}-${{ matrix.os-name }}-${{ matrix.python-version }}-manifests
           path: ./resources/user/manifests/*
 
-  cleanup:
+  post:
+    name: Post
     needs: test
     runs-on: ${{ matrix.os-name }}
     strategy:
@@ -79,7 +80,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.app }}-${{ matrix.os-name }}-${{ matrix.python-version }}-manifests
-          path: ./resources/user/manifests/
+          path: ./resources/user/manifests
       - name: Debug Info
         run: |
+          ls ./resources/user/manifests
           cat ./resources/user/manifests/pipline.txt
