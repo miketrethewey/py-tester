@@ -1,15 +1,16 @@
-import common                   # app common functions
+import common                     # app common functions
 
-import os                       # for os data, filesystem manipulation
-import platform                 # for python data
-import subprocess               # for running shell commands
-import sys                      # for system commands
-import traceback                # for errors
-from my_path import get_py_path  # pathing help
+import json                       # json manipulation
+import os                         # for os data, filesystem manipulation
+import platform                   # for python data
+import subprocess                 # for running shell commands
+import sys                        # for system commands
+import traceback                  # for errors
+from my_path import get_py_path   # pathing help
 
 env = common.prepare_env()  # get environment variables
 
-WIDTH = 60  # width for labels
+WIDTH = 70  # width for labels
 
 PYTHON_EXECUTABLE = os.path.splitext(sys.executable.split(os.path.sep).pop())[
     0]  # get command to run python
@@ -19,6 +20,7 @@ PYTHON_VERSION = sys.version.split(" ")[0]
 PYTHON_MINOR_VERSION = '.'.join(PYTHON_VERSION.split(".")[:2])
 PIP_VERSION = ""
 PIP_FLOAT_VERSION = 0
+VERSIONS = {}
 
 
 def get_module_version(module):
@@ -34,8 +36,11 @@ def get_module_version(module):
     if float(PIP_FLOAT_VERSION) >= 21.2:
         ret = subprocess.run([*args, "-m", PIPEXE, "index",
                              "versions", module], capture_output=True, text=True)
-        ver = (
-            list(map(lambda x: x.split(' ')[-1], ret.stdout.strip().split("\n")[2::])))[1]
+        lines = ret.stdout.strip().split("\n")
+        lines = lines[2::]
+        vers = (list(map(lambda x: x.split(' ')[-1], lines)))
+        if len(vers) > 1:
+            ver = vers[1]
     elif float(PIP_FLOAT_VERSION) >= 21.1:
         ret = subprocess.run(
             [*args, "-m", PIPEXE, "install", f"{module}=="], capture_output=True, text=True)
@@ -49,9 +54,8 @@ def get_module_version(module):
         ret = subprocess.run([*args, "-m", PIPEXE, "install",
                              f"{module}==blork"], capture_output=True, text=True)
 
-    if ver == "" and ret.stderr.strip():
-        ver = (ret.stderr.strip().split("\n")[0].split(
-            ",")[-1].replace(')', '')).strip()
+    # if ver == "" and ret.stderr.strip():
+    #     ver = (ret.stderr.strip().split("\n")[0].split(",")[-1].replace(')', '')).strip()
 
     return ver
 
@@ -76,24 +80,36 @@ def do_python(args):
 
 
 def do_pip(args, PIPEXE):
+    global VERSIONS
     # get pip debug info
     ret = subprocess.run([*args, "-m", PIPEXE, "--version"],
                          capture_output=True, text=True)
     if ret.stdout.strip():
         if " from " in ret.stdout.strip():
-            PIP_VERSION = ret.stdout.strip().split(" from ")[0].split(" ")[1]
+            PIP_VERSION = ret.stdout.strip().split(" from ")[
+                0].split(" ")[1]
             if PIP_VERSION:
                 b, f, a = PIP_VERSION.partition('.')
                 global PIP_FLOAT_VERSION
                 PIP_FLOAT_VERSION = b+f+a.replace('.', '')
                 PIP_LATEST = get_module_version("pip")
 
+                VERSIONS["py"] = {"version": PYTHON_VERSION,
+                                  "platform": sys.platform}
+                VERSIONS["pip"] = {
+                    "version": [
+                        PIP_VERSION,
+                        PIP_FLOAT_VERSION
+                    ],
+                    "latest": PIP_LATEST
+                }
+
                 PIP_STRING = (
                     "%s\t%s\t%s\t%s\t%s\t%s"
                     %
                     (
                         ((isinstance(args[0], list) and " ".join(
-                          args[0])) or args[0]).strip(),
+                            args[0])) or args[0]).strip(),
                         PYTHON_VERSION,
                         sys.platform,
                         PIP_EXECUTABLE,
@@ -137,6 +153,7 @@ for APP in APPS:
     # print app name
     print(APP)
     print('-' * WIDTH)
+    VERSIONS[APP] = {}
     success = False
     # foreach py executable
     for PYEXE in ["py", "python3", "python"]:
@@ -210,16 +227,22 @@ for APP in APPS:
                                 satisfied = [line[0]]
                                 sver = line[1].split('-')[1]
 
+                            modulename = satisfied[0].replace(
+                                "Requirement already satisfied: ", "")
+                            VERSIONS[APP][modulename] = {"installed": sver, "latest": (sver and get_module_version(
+                                satisfied[0].split(" ")[-1])).strip() or ""}
+
                             print(
                                 (
                                     "[%s] %s\t%s\t%s"
                                     %
                                     (
                                         "Building wheel" in line and '.' or "X",
-                                        satisfied[0],
-                                        sver,
-                                        (sver and get_module_version(
-                                            satisfied[0].split(" ")[-1])).strip() or ""
+                                        satisfied[0].ljust(
+                                            len("Requirement already satisfied: ") + len("python-bps-continued")),
+                                        VERSIONS[APP][modulename
+                                                      ]["installed"],
+                                        VERSIONS[APP][modulename]["latest"]
                                     )
                                 )
                             )
@@ -235,6 +258,11 @@ for APP in APPS:
                         else:
                             print(line.strip())
                     print("")
+                    with open(os.path.join(".", "resources", "user", "manifests", "settings.json"), "w") as settings:
+                        settings.write(json.dumps(
+                            {"py": args, "pip": PIPEXE, "pipline": " ".join(args) + " -m " + PIPEXE, "versions": VERSIONS}, indent=2))
+                    with open(os.path.join(".", "resources", "user", "manifests", "pipline.txt"), "w") as settings:
+                        settings.write(" ".join(args) + " -m " + PIPEXE)
                     success = True
         # if something else went fucky, print it
         except Exception as e:

@@ -43,3 +43,8 @@ jobs:
       - name: Run Tester
         run: |
           python ./resources/ci/common/py_tester.py ${{ matrix.app }}
+      - name: Upload documents
+        uses: actions/upload-artifact@v3
+        with:
+          name: manifests
+          path: ./resources/user/manifests/*

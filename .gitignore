@@ -1,1 +1,6 @@
+# no *.pyc
 *.pyc
+
+# not .gitkeep in user folder
+resources/user/manifests/*
+!resources/user/manifests/.gitkeep
