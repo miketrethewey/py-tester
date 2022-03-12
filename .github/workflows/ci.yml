@@ -85,5 +85,5 @@ jobs:
       - name: Debug info
         run: |
           if [ -f "${{ steps.download.outputs.download-path }}/pipline.txt" ]; then
-            cat ${{ steps.download.outputs.download-path }}/pipline.txt
+            cat ${{ steps.download.outputs.download-path }}/pipline.txt;
           fi
