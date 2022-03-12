@@ -213,7 +213,7 @@ for APP in APPS:
                                     line.strip()
                                 )
                             )
-                            exit(1)
+                            # exit(1)
                         # if it's already satisfied or building a wheel, print version data
                         elif "already satisfied" in line or \
                             "Building wheel" in line or \
