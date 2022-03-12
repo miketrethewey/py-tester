@@ -79,12 +79,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.app }}-${{ matrix.os-name }}-${{ matrix.python-version }}-manifests
-          path: ./resources/user/manifests/*
+          path: ./resources/user/manifests/
       - name: Debug Info
         run: |
           cat ./resources/user/manifests/pipline.txt
-      - name: Upload documents
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.app }}-${{ matrix.os-name }}-${{ matrix.python-version }}-manifests
-          path: ./resources/user/manifests/*
